@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solirium Demo Presentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0a0f1c 0%, #1a1f2e 100%);
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .slide {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s ease;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .slide-content {
+            max-width: 1200px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            color: #FFD700;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .feature-card {
+            background: rgba(255, 215, 0, 0.1);
+            padding: 2rem;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .stats-display {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .stat-box {
+            background: rgba(0, 255, 136, 0.1);
+            padding: 1.5rem;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #00ff88;
+        }
+
+        .tech-stack {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .tech-item {
+            background: rgba(0, 212, 255, 0.1);
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+        }
+
+        .demo-controls {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            z-index: 1000;
+        }
+
+        .btn {
+            padding: 0.8rem 2rem;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #0a0f1c;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255, 215, 0, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #FFD700, #FFA500);
+            transition: width 0.3s ease;
+            z-index: 1000;
+        }
+
+        .live-demo {
+            background: rgba(255, 215, 0, 0.05);
+            padding: 2rem;
+            border-radius: 20px;
+            border: 2px solid rgba(255, 215, 0, 0.2);
+            margin: 2rem 0;
+        }
+
+        .mockup-phone {
+            width: 300px;
+            height: 600px;
+            background: #000;
+            border-radius: 30px;
+            padding: 20px;
+            margin: 0 auto;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0a0f1c, #1a1f2e);
+            border-radius: 20px;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        .energy-meter {
+            width: 100%;
+            height: 20px;
+            background: rgba(0, 212, 255, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .meter-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00d4ff, #00ff88);
+            width: 0%;
+            animation: fillMeter 3s ease-in-out infinite alternate;
+            border-radius: 10px;
+        }
+
+        @keyframes fillMeter {
+            0% { width: 30%; }
+            100% { width: 85%; }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .slide-counter {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background: rgba(255, 215, 0, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2rem; }
+            h2 { font-size: 1.8rem; }
+            .stats-display { grid-template-columns: repeat(2, 1fr); }
+            .tech-stack { flex-direction: column; align-items: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+    <div class="slide-counter">
+        <span id="slideCounter">1 / 6</span>
+    </div>
+
+    <!-- Slide 1: Title -->
+    <div class="slide active">
+        <div class="slide-content">
+            <h1>🌞 SOLIRIUM</h1>
+            <p style="font-size: 1.5rem; margin: 1rem 0; color: #a0a8b8;">
+                Decentralized Physical Infrastructure (DePIN)<br>
+                for Fractional Solar Panel Ownership
+            </p>
+            <div style="margin: 2rem 0; font-size: 1.2rem;">
+                <div style="background: rgba(255, 215, 0, 0.1); padding: 1rem; border-radius: 10px; display: inline-block;">
+                    ⚡ Built on Hedera Blockchain<br>
+                    🏆 Hedera Africa Hackathon 2024
+                </div>
+            </div>
+            <div class="pulse" style="font-size: 4rem; margin: 2rem 0;">🔆</div>
+        </div>
+    </div>
+
+    <!-- Slide 2: Problem & Solution -->
+    <div class="slide">
+        <div class="slide-content">
+            <h2>The Problem We Solve</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">💰</div>
+                    <h3>High Barrier to Entry</h3>
+                    <p>Solar installations require significant upfront investment</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🏠</div>
+                    <h3>Limited Access</h3>
+                    <p>Not everyone owns suitable property for solar panels</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>Lack of Transparency</h3>
+                    <p>Traditional investments lack real-time performance data</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔗</div>
+                    <h3>No Fractional Ownership</h3>
+                    <p>Can't invest small amounts in renewable energy infrastructure</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 3: Live Dashboard Demo -->
+    <div class="slide">
+        <div class="slide-content">
+            <h2>Live IoT Dashboard</h2>
+            <div class="live-demo">
+                <div class="stats-display">
+                    <div class="stat-box">
+                        <div class="stat-value" id="liveEnergy">245.7</div>
+                        <div>Energy (Wh)</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="liveVoltage">228.4</div>
+                        <div>Voltage (V)</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="liveTemp">32.1</div>
+                        <div>Temperature (°C)</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value">✅</div>
+                        <div>Status</div>
+                    </div>
+                </div>
+                <div class="energy-meter">
+                    <div class="meter-fill"></div>
+                </div>
+                <p style="margin-top: 1rem; color: #00ff88;">
+                    📡 Real-time IoT sensor simulation updating every 10 seconds
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 4: NFT Minting -->
+    <div class="slide">
+        <div class="slide-content">
+            <h2>Solar Panel NFTs</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center;">
+                <div>
+                    <div class="mockup-phone">
+                        <div class="phone-screen">
+                            <div style="text-align: center;">
+                                <div style="width: 120px; height: 120px; background: linear-gradient(135deg, #FFD700, #FFA500); border-radius: 15px; margin: 2rem auto; display: flex; align-items: center; justify-content: center; font-size: 3rem;">🔆</div>
+                                <h3>Solar Panel #001</h3>
+                                <p style="font-size: 0.9rem; margin: 1rem 0; color: #a0a8b8;">Fractional ownership NFT representing real solar infrastructure</p>
+                                <div style="background: linear-gradient(135deg, #FFD700, #FFA500); color: #0a0f1c; padding: 0.8rem; border-radius: 20px; margin: 1rem 0; font-weight: bold;">Mint NFT</div>
+                                <div style="font-size: 0.8rem; color: #00ff88; margin-top: 1rem;">Token ID: 0.0.123456<br>Serial: #1</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="feature-card">
+                        <h3>🏭 Real Infrastructure</h3>
+                        <p>Each NFT represents ownership of physical solar panels generating real energy</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>🔗 Hedera Powered</h3>
+                        <p>Low-cost, energy-efficient blockchain transactions</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>💱 Tradeable Assets</h3>
+                        <p>Buy, sell, and trade fractional solar ownership</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 5: Rewards System -->
+    <div class="slide">
+        <div class="slide-content">
+            <h2>Earn HBAR Rewards</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center;">
+                <div>
+                    <div class="feature-card" style="text-align: left;">
+                        <h3 style="color: #FFD700;">💰 Passive Income Model</h3>
+                        <div style="margin: 1.5rem 0;">
+                            <div style="display: flex; justify-content: space-between; margin: 0.5rem 0;">
+                                <span>Energy Generated:</span>
+                                <span style="color: #00ff88;" id="totalEnergy">1,247 Wh</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin: 0.5rem 0;">
+                                <span>Conversion Rate:</span>
+                                <span style="color: #FFD700;">1000 Wh = 1 HBAR</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin: 0.5rem 0;">
+                                <span>Rewards Available:</span>
+                                <span style="color: #00ff88;">1.24 HBAR</span>
+                            </div>
+                        </div>
+                        <div class="energy-meter" style="margin: 1rem 0;">
+                            <div class="meter-fill"></div>
+                        </div>
+                        <div style="background: linear-gradient(135deg, #00d4ff, #00ff88); color: #0a0f1c; padding: 0.8rem; border-radius: 20px; text-align: center; font-weight: bold; margin: 1rem 0;">
+                            Claim Rewards
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🌱</div>
+                        <h3>Sustainable Returns</h3>
+                        <p>Earn rewards based on actual clean energy generation</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📈</div>
+                        <h3>Transparent Tracking</h3>
+                        <p>All energy production and rewards are blockchain-verified</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">⚡</div>
+                        <h3>Real-time Updates</h3>
+                        <p>Monitor your investment performance 24/7</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 6: Technical Stack -->
+    <div class="slide">
+        <div class="slide-content">
+            <h2>Technical Excellence</h2>
+            <div class="tech-stack">
+                <div class="tech-item">🐍 Flask Backend</div>
+                <div class="tech-item">⚡ Hedera Blockchain</div>
+                <div class="tech-item">📱 Responsive Frontend</div>
+                <div class="tech-item">🔄 Real-time IoT Simulation</div>
+                <div class="tech-item">🚀 Production Ready</div>
+            </div>
+            
+            <div style="margin: 3rem 0; padding: 2rem; background: rgba(0, 255, 136, 0.1); border-radius: 20px; border: 1px solid rgba(0, 255, 136, 0.3);">
+                <h3 style="color: #00ff88; margin-bottom: 1rem;">🚀 Deployment Ready</h3>
+                <p>✅ Optimized for Render deployment<br>
+                ✅ Environment-based configuration<br>
+                ✅ Production-grade security<br>
+                ✅ Scalable architecture</p>
+            </div>
+
+            <div style="font-size: 1.2rem; margin: 2rem 0;">
+                <strong style="color: #FFD700;">Democratizing access to renewable energy investments through blockchain technology</strong>
+            </div>
+        </div>
+    </div>
+
+    <div class="demo-controls">
+        <button class="btn" onclick="previousSlide()" id="prevBtn" disabled>Previous</button>
+        <button class="btn" onclick="toggleAutoplay()" id="autoplayBtn">Auto Play</button>
+        <button class="btn" onclick="nextSlide()" id="nextBtn">Next</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        let autoplay = false;
+        let autoplayInterval;
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                slide.classList.toggle('active', index === currentSlide);
+            });
+            
+            document.getElementById('slideCounter').textContent = `${currentSlide + 1} / ${totalSlides}`;
+            document.getElementById('progressBar').style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
+            
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateSlide();
+            }
+        }
+
+        function previousSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlide();
+            }
+        }
+
+        function toggleAutoplay() {
+            const btn = document.getElementById('autoplayBtn');
+            if (autoplay) {
+                clearInterval(autoplayInterval);
+                autoplay = false;
+                btn.textContent = 'Auto Play';
+            } else {
+                autoplayInterval = setInterval(() => {
+                    if (currentSlide < totalSlides - 1) {
+                        nextSlide();
+                    } else {
+                        currentSlide = 0;
+                        updateSlide();
+                    }
+                }, 4000);
+                autoplay = true;
+                btn.textContent = 'Stop Auto';
+            }
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+            if (e.key === 'ArrowLeft') previousSlide();
+        });
+
+        // Simulate live data updates
+        function updateLiveData() {
+            const energyEl = document.getElementById('liveEnergy');
+            const voltageEl = document.getElementById('liveVoltage');
+            const tempEl = document.getElementById('liveTemp');
+            const totalEnergyEl = document.getElementById('totalEnergy');
+            
+            if (energyEl) {
+                const hour = new Date().getHours();
+                const baseEnergy = (hour >= 10 && hour <= 16) ? 
+                    200 + Math.random() * 100 : 
+                    10 + Math.random() * 40;
+                
+                energyEl.textContent = baseEnergy.toFixed(1);
+                voltageEl.textContent = (220 + Math.random() * 20).toFixed(1);
+                tempEl.textContent = (20 + Math.random() * 25).toFixed(1);
+                totalEnergyEl.textContent = Math.floor(1000 + Math.random() * 500) + ' Wh';
+            }
+        }
+
+        // Update live data every 3 seconds
+        setInterval(updateLiveData, 3000);
+        updateLiveData();
+    </script>
+</body>
+</html>

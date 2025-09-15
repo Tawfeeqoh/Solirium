@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solirium - Fractional Solar Ownership on Hedera</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-solar: #FFD700;
+            --secondary-solar: #FFA500;
+            --dark-bg: #0a0f1c;
+            --card-bg: #1a1f2e;
+            --text-light: #ffffff;
+            --text-gray: #a0a8b8;
+            --accent-blue: #00d4ff;
+            --success-green: #00ff88;
+            --gradient-solar: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            --gradient-space: linear-gradient(135deg, #0a0f1c 0%, #1a1f2e 100%);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-light);
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(26, 31, 46, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: 'Orbitron', monospace;
+            font-weight: 900;
+            font-size: 1.5rem;
+            color: var(--primary-solar);
+        }
+
+        .logo img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-solar);
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1.5rem;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: var(--gradient-solar);
+            color: var(--dark-bg);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--primary-solar);
+            border: 2px solid var(--primary-solar);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255, 215, 0, 0.3);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            background: var(--gradient-space);
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><radialGradient id="star" cx="50%" cy="50%" r="2px"><stop offset="0%" style="stop-color:white;stop-opacity:1" /><stop offset="100%" style="stop-color:white;stop-opacity:0" /></radialGradient></defs><circle cx="20" cy="20" r="1" fill="url(%23star)" /><circle cx="80" cy="30" r="1" fill="url(%23star)" /><circle cx="30" cy="70" r="1" fill="url(%23star)" /><circle cx="70" cy="80" r="1" fill="url(%23star)" /></svg>') repeat;
+            opacity: 0.3;
+            animation: twinkle 4s ease-in-out infinite alternate;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0.3; }
+            100% { opacity: 0.8; }
+        }
+
+        .hero-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-content h1 {
+            font-family: 'Orbitron', monospace;
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            background: var(--gradient-solar);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-content .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-gray);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .hero-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .stat-card {
+            background: rgba(255, 215, 0, 0.1);
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .stat-value {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-solar);
+        }
+
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 1rem 0;
+            padding: 0.5rem 1rem;
+            background: rgba(0, 255, 136, 0.1);
+            border-radius: 25px;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            width: fit-content;
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--success-green);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(0, 255, 136, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 255, 136, 0); }
+        }
+
+        /* Dashboard Section */
+        .dashboard {
+            padding: 6rem 0;
+            background: var(--card-bg);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 3rem;
+            color: var(--primary-solar);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .dashboard-card {
+            background: var(--dark-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(255, 215, 0, 0.2);
+        }
+
+        .card-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: var(--primary-solar);
+        }
+
+        .data-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-light);
+            margin: 0.5rem 0;
+        }
+
+        .data-unit {
+            color: var(--text-gray);
+            font-size: 0.9rem;
+        }
+
+        /* NFT Section */
+        .nft-section {
+            padding: 6rem 0;
+            background: var(--dark-bg);
+        }
+
+        .nft-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 3rem;
+            text-align: center;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .nft-visual {
+            width: 200px;
+            height: 200px;
+            background: var(--gradient-solar);
+            border-radius: 15px;
+            margin: 0 auto 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            box-shadow: 0 20px 40px rgba(255, 215, 0, 0.3);
+        }
+
+        .btn-large {
+            padding: 1rem 3rem;
+            font-size: 1.1rem;
+            border-radius: 30px;
+        }
+
+        /* Rewards Section */
+        .rewards {
+            padding: 6rem 0;
+            background: var(--card-bg);
+        }
+
+        .rewards-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        .energy-meter {
+            background: var(--dark-bg);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 2px solid rgba(0, 212, 255, 0.3);
+        }
+
+        .meter-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(0, 212, 255, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .meter-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-blue), var(--success-green));
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
+
+        /* Partners Section */
+        .partners {
+            padding: 6rem 0;
+            background: var(--dark-bg);
+            overflow: hidden;
+        }
+
+        .partners-scroll {
+            display: flex;
+            animation: scroll 20s linear infinite;
+            gap: 3rem;
+        }
+
+        .partner-logo {
+            width: 120px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+        }
+
+        .partner-logo:hover {
+            transform: scale(1.1);
+        }
+
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero-container {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .rewards-container {
+                grid-template-columns: 1fr;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Loading States */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 215, 0, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary-solar);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .disabled {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <img src="logo.png" alt="Solirium Logo" onerror="this.style.display='none'">
+                <span>SOLIRIUM</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#dashboard">Dashboard</a></li>
+                <li><a href="#nft">Solar NFTs</a></li>
+                <li><a href="#rewards">Rewards</a></li>
+                <li><a href="#partners">Partners</a></li>
+            </ul>
+            <div class="auth-buttons">
+                <a href="#" class="btn btn-secondary" onclick="showLogin()">Login</a>
+                <a href="#" class="btn btn-primary" onclick="showSignup()">Sign Up</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-container">
+            <div class="hero-content">
+                <h1>Own the Future of Solar Energy</h1>
+                <p class="subtitle">
+                    Solirium revolutionizes renewable energy investment through fractional ownership of solar panels on the Hedera blockchain. 
+                    Earn HBAR rewards from real solar energy generation while contributing to a sustainable future.
+                </p>
+                
+                <div class="connection-status" id="connectionStatus">
+                    <div class="status-indicator"></div>
+                    <span>Checking Connection...</span>
+                </div>
+
+                <div class="hero-stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalEnergy">0</div>
+                        <div class="data-unit">kWh Generated</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="activeNFTs">0</div>
+                        <div class="data-unit">Active Solar NFTs</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalRewards">0.00</div>
+                        <div class="data-unit">HBAR Earned</div>
+                    </div>
+                </div>
+
+                <div class="hero-actions">
+                    <a href="#dashboard" class="btn btn-primary btn-large">Start Investing</a>
+                    <a href="#nft" class="btn btn-secondary btn-large">Mint Solar NFT</a>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="nft-visual">🌞</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Live Dashboard -->
+    <section id="dashboard" class="dashboard">
+        <div class="container">
+            <h2 class="section-title">Live Solar Data</h2>
+            <div class="dashboard-grid">
+                <div class="dashboard-card">
+                    <h3 class="card-title">Energy Output</h3>
+                    <div class="data-value" id="liveEnergy">-</div>
+                    <div class="data-unit">Wh (Current)</div>
+                </div>
+                <div class="dashboard-card">
+                    <h3 class="card-title">Panel Voltage</h3>
+                    <div class="data-value" id="liveVoltage">-</div>
+                    <div class="data-unit">V</div>
+                </div>
+                <div class="dashboard-card">
+                    <h3 class="card-title">Temperature</h3>
+                    <div class="data-value" id="liveTemperature">-</div>
+                    <div class="data-unit">°C</div>
+                </div>
+                <div class="dashboard-card">
+                    <h3 class="card-title">Panel Status</h3>
+                    <div class="data-value" id="panelStatus">Active</div>
+                    <div class="data-unit" id="lastUpdate">Updated now</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- NFT Minting -->
+    <section id="nft" class="nft-section">
+        <div class="container">
+            <h2 class="section-title">Mint Your Solar Panel NFT</h2>
+            <div class="nft-card">
+                <div class="nft-visual">🔆</div>
+                <h3>Solirium Solar Panel #001</h3>
+                <p>Own a piece of renewable energy infrastructure. Each NFT represents fractional ownership of a physical solar panel generating real energy.</p>
+                <br>
+                <button class="btn btn-primary btn-large" id="mintButton" onclick="mintNFT()">
+                    <span id="mintText">Mint Solar NFT</span>
+                    <div class="loading" id="mintLoading" style="display: none;"></div>
+                </button>
+                <div id="mintResult" style="margin-top: 1rem;"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Rewards Section -->
+    <section id="rewards" class="rewards">
+        <div class="container">
+            <h2 class="section-title">Claim Your Energy Rewards</h2>
+            <div class="rewards-container">
+                <div class="energy-meter">
+                    <h3 class="card-title">Accumulated Energy</h3>
+                    <div class="data-value" id="accumulatedEnergy">0.00</div>
+                    <div class="data-unit">Wh Ready for Rewards</div>
+                    <div class="meter-bar">
+                        <div class="meter-fill" id="energyMeter"></div>
+                    </div>
+                    <p>1000 Wh = 1 HBAR</p>
+                </div>
+                <div style="text-align: center;">
+                    <h3>Claim HBAR Rewards</h3>
+                    <p>Convert your generated solar energy into HBAR tokens on the Hedera network.</p>
+                    <br>
+                    <button class="btn btn-primary btn-large" id="claimButton" onclick="claimRewards()">
+                        <span id="claimText">Claim Rewards</span>
+                        <div class="loading" id="claimLoading" style="display: none;"></div>
+                    </button>
+                    <div id="claimResult" style="margin-top: 1rem;"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Partners Section -->
+    <section id="partners" class="partners">
+        <div class="container">
+            <h2 class="section-title">Trusted Partners</h2>
+            <div class="partners-scroll">
+                <div class="partner-logo">
+                    <img src="https://placehold.co/120x80/333/fff?text=Hedera" alt="Hedera">
+                </div>
+                <div class="partner-logo">
+                    <img src="https://placehold.co/120x80/333/fff?text=SolarTech" alt="SolarTech">
+                </div>
+                <div class="partner-logo">
+                    <img src="https://placehold.co/120x80/333/fff?text=GreenEnergy" alt="GreenEnergy">
+                </div>
+                <div class="partner-logo">
+                    <img src="https://placehold.co/120x80/333/fff?text=EcoChain" alt="EcoChain">
+                </div>
+                <div class="partner-logo">
+                    <img src="https://placehold.co/120x80/333/fff?text=CleanPower" alt="CleanPower">
+                </div>
+                <div class="partner-logo">
+                    <img src="https://placehold.co/120x80/333/fff?text=SustainX" alt="SustainX">
+                </div>
+                <!-- Duplicate for seamless scroll -->
+                <div class="partner-logo">
+                    <img src="https://placehold.co/120x80/333/fff?text=Hedera" alt="Hedera">
+                </div>
+                <div class="partner-logo">
+                    <img src="https://placehold.co/120x80/333/fff?text=SolarTech" alt="SolarTech">
+                </div>
+                <div class="partner-logo">
+                    <img src="https://placehold.co/120x80/333/fff?text=GreenEnergy" alt="GreenEnergy">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // API Configuration - use relative paths for production deployment
+        const API_BASE = '';
+        let isConnected = false;
+        let totalAccumulatedEnergy = 0;
+
+        // Check backend connection
+        async function checkConnection() {
+            try {
+                const response = await fetch(`${API_BASE}/api/health`);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const data = await response.json();
+                if (data.status === 'ok') {
+                    isConnected = true;
+                    updateConnectionStatus(true);
+                    return true;
+                }
+                throw new Error('Invalid health response');
+            } catch (error) {
+                console.error('Backend connection failed:', error);
+                isConnected = false;
+                updateConnectionStatus(false);
+                return false;
+            }
+        }
+
+        // Update connection status display
+        function updateConnectionStatus(connected) {
+            const statusEl = document.getElementById('connectionStatus');
+            const indicator = statusEl.querySelector('.status-indicator');
+            const text = statusEl.querySelector('span');
+            
+            if (connected) {
+                statusEl.style.background = 'rgba(0, 255, 136, 0.1)';
+                statusEl.style.borderColor = 'rgba(0, 255, 136, 0.3)';
+                indicator.style.background = '#00ff88';
+                text.textContent = 'Backend Connected';
+            } else {
+                statusEl.style.background = 'rgba(255, 0, 0, 0.1)';
+                statusEl.style.borderColor = 'rgba(255, 0, 0, 0.3)';
+                indicator.style.background = '#ff0000';
+                text.textContent = 'Backend Disconnected';
+            }
+        }
+
+        // Safely update text content to prevent XSS
+        function safeSetText(elementId, value) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.textContent = String(value);
+            }
+        }
+
+        // Safely set numeric value with validation
+        function safeSetNumber(elementId, value, decimals = 2) {
+            const numValue = parseFloat(value);
+            if (!isNaN(numValue)) {
+                safeSetText(elementId, numValue.toFixed(decimals));
+            }
+        }
+
+        // Fetch live panel data
+        async function fetchPanelData() {
+            try {
+                const response = await fetch(`${API_BASE}/api/panel-data`);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const data = await response.json();
+                
+                // Validate and safely handle numeric data
+                if (data.hasOwnProperty('energy_wh') && data.hasOwnProperty('voltage') && data.hasOwnProperty('temperature')) {
+                    safeSetNumber('liveEnergy', data.energy_wh, 2);
+                    safeSetNumber('liveVoltage', data.voltage, 1);
+                    safeSetNumber('liveTemperature', data.temperature, 1);
+                    
+                    // Accumulate energy for rewards (handle zero values correctly)
+                    const energyValue = parseFloat(data.energy_wh);
+                    if (!isNaN(energyValue) && energyValue >= 0) {
+                        totalAccumulatedEnergy += energyValue;
+                        updateEnergyMeter();
+                    }
+                    
+                    // Update timestamp
+                    safeSetText('lastUpdate', 'Updated ' + new Date().toLocaleTimeString());
+                }
+            } catch (error) {
+                console.error('Error fetching panel data:', error);
+                // Don't block UI - just log the error
+            }
+        }
+
+        // Update energy meter and accumulated energy display
+        function updateEnergyMeter() {
+            safeSetNumber('accumulatedEnergy', totalAccumulatedEnergy, 2);
+            
+            // Update progress bar (max 1000 Wh for 1 HBAR)
+            const percentage = Math.min((totalAccumulatedEnergy % 1000) / 1000 * 100, 100);
+            const meterEl = document.getElementById('energyMeter');
+            if (meterEl) {
+                meterEl.style.width = percentage + '%';
+            }
+            
+            // Update total rewards estimate
+            const totalRewards = Math.floor(totalAccumulatedEnergy / 1000);
+            safeSetNumber('totalRewards', totalRewards, 2);
+        }
+
+        // Mint NFT function
+        async function mintNFT() {
+            const button = document.getElementById('mintButton');
+            const text = document.getElementById('mintText');
+            const loading = document.getElementById('mintLoading');
+            const result = document.getElementById('mintResult');
+            
+            // Show loading state
+            button.classList.add('disabled');
+            text.style.display = 'none';
+            loading.style.display = 'inline-block';
+            result.textContent = '';
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/mint-nft`);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    // Use safe text content to prevent XSS
+                    result.innerHTML = `
+                        <div style="color: #00ff88; margin-top: 1rem;">
+                            ✅ NFT Minted Successfully!<br>
+                            <span>Token ID: </span><span>${escapeHtml(String(data.token_id))}</span><br>
+                            <span>Serial #: </span><span>${escapeHtml(String(data.nft_serial))}</span>
+                        </div>
+                    `;
+                    // Update active NFTs counter
+                    safeSetText('activeNFTs', '1');
+                } else {
+                    result.innerHTML = `<div style="color: #ff4444;">❌ Error: ${escapeHtml(data.error || 'Unknown error')}</div>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<div style="color: #ff4444;">❌ Network Error: ${escapeHtml(error.message)}</div>`;
+            } finally {
+                // Reset button state
+                button.classList.remove('disabled');
+                text.style.display = 'inline';
+                loading.style.display = 'none';
+            }
+        }
+
+        // Escape HTML to prevent XSS
+        function escapeHtml(unsafe) {
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // Claim rewards function
+        async function claimRewards() {
+            if (totalAccumulatedEnergy < 100) {
+                alert('Minimum 100 Wh required to claim rewards.');
+                return;
+            }
+
+            const ownerId = prompt('Enter your Hedera Account ID (e.g., 0.0.12345):');
+            if (!ownerId || !ownerId.trim()) return;
+
+            const button = document.getElementById('claimButton');
+            const text = document.getElementById('claimText');
+            const loading = document.getElementById('claimLoading');
+            const result = document.getElementById('claimResult');
+            
+            // Show loading state
+            button.classList.add('disabled');
+            text.style.display = 'none';
+            loading.style.display = 'inline-block';
+            result.textContent = '';
+            
+            try {
+                const encodedOwnerId = encodeURIComponent(ownerId.trim());
+                const response = await fetch(`${API_BASE}/api/distribute-rewards?owner_id=${encodedOwnerId}`);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const data = await response.json();
+                
+                if (data.status === 'reward_distributed') {
+                    const energyValue = parseFloat(data.energy_wh);
+                    result.innerHTML = `
+                        <div style="color: #00ff88; margin-top: 1rem;">
+                            ✅ Rewards Claimed!<br>
+                            <span>Energy: </span><span>${escapeHtml(isNaN(energyValue) ? 'N/A' : energyValue.toFixed(2))} Wh</span><br>
+                            <span>Sent to: </span><span>${escapeHtml(String(data.recipient))}</span>
+                        </div>
+                    `;
+                    // Reset accumulated energy
+                    totalAccumulatedEnergy = 0;
+                    updateEnergyMeter();
+                } else {
+                    result.innerHTML = `<div style="color: #ff4444;">❌ Error: ${escapeHtml(data.error || 'Unknown error')}</div>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<div style="color: #ff4444;">❌ Network Error: ${escapeHtml(error.message)}</div>`;
+            } finally {
+                // Reset button state
+                button.classList.remove('disabled');
+                text.style.display = 'inline';
+                loading.style.display = 'none';
+            }
+        }
+
+        // Simple auth modals (placeholder)
+        function showLogin() {
+            alert('Login functionality - Would integrate with Hedera wallet connection in production');
+        }
+
+        function showSignup() {
+            alert('Signup functionality - Would integrate with Hedera account creation in production');
+        }
+
+        // Smooth scrolling for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check backend connection
+            checkConnection();
+            
+            // Set up periodic data fetching
+            setInterval(checkConnection, 30000); // Check connection every 30s
+            setInterval(fetchPanelData, 5000); // Fetch data every 5s
+            
+            // Initial data fetch
+            setTimeout(fetchPanelData, 1000);
+        });
+    </script>
+</body>
+</html>
